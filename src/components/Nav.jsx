@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 
 const pages = [
   { title: "일기장", url: "/diary" },
+  { title: "쓰기", url: "/diary/write" },
   { title: "기록", url: "/record" },
   { title: "통계", url: "/analysis" },
   { title: "로그인", url: "/sign-in" },
@@ -34,6 +35,12 @@ const Nav = () => {
     palette: {
       background: { default: "#ffffff" },
       primary: { main: "#000000" },
+    },
+    typography: {
+      fontFamily: "'SSRONETHandwritten', sans-serif",
+      h6: {
+        fontSize: "1.5rem",
+      },
     },
   });
 
@@ -58,6 +65,10 @@ const Nav = () => {
                   to={page.url}
                   color="inherit"
                   key={page.title}
+                  sx={{
+                    fontSize: "1.25rem",
+                    padding: "0.75rem 1.5rem",
+                  }}
                 >
                   {page.title}
                 </Button>

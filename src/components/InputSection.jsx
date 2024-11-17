@@ -34,6 +34,22 @@ const Label = styled.label`
 
 const Input = styled.input`
   font-size: clamp(1.5rem, 4vw + 0.5rem, 0.5rem);
+
+  border: none;
+  border-bottom: 2px solid #ccc;
+  outline: none;
+  padding: 8px 4px;
+  font-size: 16px;
+
+  &:focus {
+    border-bottom-color: #ffc247;
+  }
+`;
+
+const ScoreText = styled.span`
+  font-size: 2rem;
+  color: #555;
+  margin-left: 7px;
 `;
 
 const TextInput = styled.textarea`
@@ -46,6 +62,10 @@ const TextInput = styled.textarea`
   padding: 10px;
   resize: none;
   font-size: 1.5rem;
+
+  &:focus {
+    border-color: #ffc247 !important;
+  }
 `;
 
 const MoodIconContainer = styled.div`
@@ -117,6 +137,7 @@ const InputSection = ({ errors, register, toggleMood, checkedMoods }) => (
           max: 10,
         })}
       />
+      <ScoreText>/10</ScoreText>
     </FormInput>
 
     <InputItemWrap>

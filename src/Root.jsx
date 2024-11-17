@@ -59,6 +59,9 @@ a {
   text-decoration-line: none;
 	color: black;
 }
+textarea {
+  outline: none;
+}
 `;
 
 const Root = () => {

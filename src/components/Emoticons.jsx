@@ -22,7 +22,7 @@ const DepressedEmoticon = ({ checked }) => (
 );
 
 const AnxiousEmoticon = ({ checked }) => (
-  <EmoticonWrapper color="#fa7938" checked={checked}>
+  <EmoticonWrapper color="#ff9a19" checked={checked}>
     <FontAwesomeIcon icon={faFaceFrown} />
   </EmoticonWrapper>
 );

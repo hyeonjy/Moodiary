@@ -4,9 +4,10 @@ import { ReactTyped } from "react-typed";
 import { Link } from "react-router-dom";
 
 const Container = styled.div`
-  margin-top: 150px;
+  margin-top: 160px;
   /* background-color: orange; */
   width: 100%;
+  /* height: 100vh; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -32,7 +33,7 @@ const Button = styled.div`
   font-weight: 600;
   cursor: pointer;
   &:hover {
-    background-color: #b99622;
+    background-color: #e6b800;
   }
 `;
 

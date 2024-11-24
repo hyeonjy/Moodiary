@@ -59,7 +59,7 @@ const Home = () => {
     <Container>
       <Title>✏️ 나만의 감정일기장</Title>
       <Subtitle>떠오르는 감정들을 편안히 채워보세요.</Subtitle>
-      <Link to="/diary/write">
+      <Link to="/new-diary">
         <Button>일기 쓰러가기</Button>
       </Link>
       <TextBox>

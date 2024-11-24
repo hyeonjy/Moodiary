@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import useDiaryStore from "../store/diaryStore";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -30,34 +30,28 @@ const MonthDisplay = styled.h2`
 `;
 
 const MonthNavigation = () => {
-  const { selectedDate, setSelectedDate } = useDiaryStore();
-  const { month, year } = selectedDate;
+  const { year, month } = useParams();
+  const navigate = useNavigate();
 
-  const handlePreviousMonth = () => {
-    if (month === 1) {
-      setSelectedDate(12, year - 1);
-    } else {
-      setSelectedDate(month - 1, year);
-    }
-  };
+  const handleMonthChange = (offset) => {
+    const newDate = new Date(
+      parseInt(year, 10),
+      parseInt(month, 10) - 1 + offset
+    );
 
-  const handleNextMonth = () => {
-    if (month === 12) {
-      setSelectedDate(1, year + 1);
-    } else {
-      setSelectedDate(month + 1, year);
-    }
+    // URL 업데이트
+    navigate(`/diary/${newDate.getFullYear()}/${newDate.getMonth() + 1}`);
   };
 
   return (
     <Container>
-      <NavButtonIcon position="before" onClick={handlePreviousMonth}>
+      <NavButtonIcon position="before" onClick={() => handleMonthChange(-1)}>
         <FontAwesomeIcon icon={faChevronLeft} />
       </NavButtonIcon>
 
       <MonthDisplay>{`${year}년 ${month}월`}</MonthDisplay>
 
-      <NavButtonIcon position="after" onClick={handleNextMonth}>
+      <NavButtonIcon position="after" onClick={() => handleMonthChange(1)}>
         <FontAwesomeIcon icon={faChevronRight} />
       </NavButtonIcon>
     </Container>

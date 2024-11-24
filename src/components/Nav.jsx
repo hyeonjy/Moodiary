@@ -14,10 +14,13 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
 
+const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth() + 1;
+
 const pages = [
   { title: "일기장", url: "/diary" },
-  { title: "쓰기", url: "/diary/write" },
-  { title: "기록", url: "/record" },
+  { title: "쓰기", url: "/new-diary" },
+  { title: "기록", url: `/diary/${currentYear}/${currentMonth}` },
   { title: "통계", url: "/analysis" },
   { title: "로그인", url: "/sign-in" },
 ];
@@ -100,8 +103,14 @@ const Nav = () => {
             </Box>
             <Typography
               variant="h6"
-              component="div"
-              sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}
+              component={Link}
+              to="/"
+              sx={{
+                flexGrow: 1,
+                display: { xs: "flex", md: "none" },
+                textDecoration: "none",
+                color: "inherit",
+              }}
             >
               오늘의 하루
             </Typography>

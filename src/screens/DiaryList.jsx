@@ -3,7 +3,6 @@ import styled from "styled-components";
 import MonthNavigation from "../components/MonthNavigation";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import useDiaryStore from "../store/diaryStore";
 import { moods, MoodIcon } from "../components/MoodIcons";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -11,6 +10,8 @@ import {
   useDeleteDiaryData,
 } from "../components/fetchDiaryEntries";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const Container = styled.div`
   margin-top: 100px;
@@ -24,7 +25,7 @@ const NoDiaryMessage = styled.span`
   margin-top: 100px;
 `;
 
-const EmotionList = styled.div`
+const StyledDiaryList = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -74,7 +75,7 @@ const ScoreText = styled.span`
   margin-left: 5px;
 `;
 
-const Description = styled.div`
+const Content = styled.div`
   font-size: 1.1rem;
   color: #333;
   margin-top: 15px;
@@ -98,16 +99,14 @@ const Icon = styled(FontAwesomeIcon)`
   }
 `;
 
-const Record = () => {
+const DiaryList = () => {
+  const { year, month } = useParams();
   const { data: diary, isLoading } = useQuery({
     queryKey: ["allDiary"],
     queryFn: fetchDiaryEntries,
   });
   console.log("isloading: ", isLoading);
   console.log("diary: ", diary);
-
-  const { selectedDate } = useDiaryStore();
-  const { month, year } = selectedDate;
 
   const { mutate: deleteDiary } = useDeleteDiaryData();
 
@@ -116,16 +115,15 @@ const Record = () => {
     return diary.filter((entry) => {
       const entryDate = new Date(entry.date);
       return (
-        entryDate.getMonth() + 1 === month && entryDate.getFullYear() === year
+        entryDate.getMonth() + 1 === +month && entryDate.getFullYear() === +year
       );
     });
   }, [diary, month, year]);
 
-  console.log("filteredDiary: ", filteredDiary);
-
   if (isLoading) {
     return <Container>...Loading</Container>;
   }
+
   if (!filteredDiary.length) {
     return (
       <Container>
@@ -138,20 +136,26 @@ const Record = () => {
   return (
     <Container>
       <MonthNavigation />
-      <EmotionList>
+      <StyledDiaryList>
         {filteredDiary.map((entry) => (
-          <DiaryEntry
+          <DiaryItem
             key={entry.id}
             entry={entry}
             onDelete={() => deleteDiary(entry.id)}
           />
         ))}
-      </EmotionList>
+      </StyledDiaryList>
     </Container>
   );
 };
 
-const DiaryEntry = ({ entry, onDelete }) => {
+const DiaryItem = ({ entry, onDelete }) => {
+  const navigate = useNavigate();
+
+  const handleEdit = () => {
+    navigate(`/edit-diary/${entry.id}`, { state: { diary: entry } });
+  };
+
   const moodData = moods.find((m) => m.mood === entry.post_moods[0].mood);
 
   return (
@@ -168,13 +172,13 @@ const DiaryEntry = ({ entry, onDelete }) => {
           </EmotionTitle>
         </div>
         <IconWrapper>
-          <Icon icon={faPen} />
+          <Icon icon={faPen} onClick={handleEdit} />
           <Icon icon={faTrash} onClick={onDelete} />
         </IconWrapper>
       </EmotionHeader>
-      <Description>{entry.description}</Description>
+      <Content>{entry.content}</Content>
     </EmotionItem>
   );
 };
 
-export default Record;
+export default DiaryList;

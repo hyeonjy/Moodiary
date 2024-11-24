@@ -35,11 +35,12 @@ const Label = styled.label`
 const Input = styled.input`
   font-size: clamp(1.5rem, 4vw + 0.5rem, 0.5rem);
 
+  font-family: "SSRONETHandwritten", sans-serif;
   border: none;
   border-bottom: 2px solid #ccc;
   outline: none;
   padding: 8px 4px;
-  font-size: 16px;
+  font-size: 1.5rem;
 
   &:focus {
     border-bottom-color: #ffc247;
@@ -98,63 +99,64 @@ const FormInput = ({ label, htmlFor, children }) => (
   </InputItemWrap>
 );
 
-const InputSection = ({ errors, register, toggleMood, checkedMoods }) => (
-  <InputWrap>
-    <Title>감정일기</Title>
+const InputSection = ({ errors, register, toggleMood, checkedMoods }) => {
+  return (
+    <InputWrap>
+      <Title>감정일기</Title>
 
-    <FormInput label="날짜" htmlFor="date">
-      <Input
-        type="date"
-        id="date"
-        {...register("date", { required: "날짜를 체크해주세요" })}
+      <FormInput label="날짜" htmlFor="date">
+        <Input
+          type="date"
+          id="date"
+          {...register("date", { required: "날짜를 체크해주세요" })}
+        />
+      </FormInput>
+
+      <FormInput label="감정">
+        {moods.map(({ mood }) => (
+          <MoodIconContainer key={mood} onClick={() => toggleMood(mood)}>
+            {checkedMoods[mood] && <CheckIcon icon={faCheck} />}
+            <MoodIcon mood={mood} checked={checkedMoods[mood]} />
+          </MoodIconContainer>
+        ))}
+      </FormInput>
+
+      <input
+        type="hidden"
+        {...register("mood", { required: "감정 이모지를 선택해주세요" })}
       />
-    </FormInput>
 
-    <FormInput label="감정" htmlFor="mood">
-      {moods.map(({ mood }) => (
-        <MoodIconContainer key={mood} onClick={() => toggleMood(mood)}>
-          {checkedMoods[mood] && <CheckIcon icon={faCheck} />}
-          <MoodIcon mood={mood} checked={checkedMoods[mood]} />
-        </MoodIconContainer>
-      ))}
-    </FormInput>
+      <FormInput label="기분점수" htmlFor="score">
+        <Input
+          type="number"
+          id="score"
+          min="0"
+          max="10"
+          {...register("score", {
+            required: "점수를 입력해주세요",
+            min: 0,
+            max: 10,
+          })}
+        />
+        <ScoreText>/10</ScoreText>
+      </FormInput>
 
-    <input
-      type="hidden"
-      id="mood"
-      {...register("mood", { required: "감정 이모지를 선택해주세요" })}
-    />
+      <InputItemWrap>
+        <TextInput
+          id="content"
+          placeholder="오늘의 감정을 적어보세요"
+          {...register("content", { required: "일기를 작성해주세요" })}
+        />
+      </InputItemWrap>
 
-    <FormInput label="기분점수" htmlFor="score">
-      <Input
-        type="number"
-        id="score"
-        min="0"
-        max="10"
-        {...register("score", {
-          required: "점수를 입력해주세요",
-          min: 0,
-          max: 10,
-        })}
-      />
-      <ScoreText>/10</ScoreText>
-    </FormInput>
-
-    <InputItemWrap>
-      <TextInput
-        id="description"
-        placeholder="오늘의 감정을 적어보세요"
-        {...register("description", { required: "일기를 작성해주세요" })}
-      />
-    </InputItemWrap>
-
-    <ErrorMessage>
-      {errors?.date?.message ||
-        errors?.mood?.message ||
-        errors?.score?.message ||
-        errors?.description?.message}
-    </ErrorMessage>
-  </InputWrap>
-);
+      <ErrorMessage>
+        {errors?.date?.message ||
+          errors?.mood?.message ||
+          errors?.score?.message ||
+          errors?.content?.message}
+      </ErrorMessage>
+    </InputWrap>
+  );
+};
 
 export default InputSection;

@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import InputSection from "../components/InputSection";
 import ButtonSection from "../components/ButtonSection";
-import { useAddDiaryData } from "../components/fetchDiaryEntries.js";
+import {
+  useAddDiaryData,
+  useUpdateDiaryData,
+} from "../components/fetchDiaryEntries";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   margin-top: 120px;
@@ -14,55 +17,95 @@ const Container = styled.div`
   height: 100vh;
 `;
 
-const DiaryForm = () => {
+const DiaryForm = ({ initialData = {}, isUpdate }) => {
+  const { mutate: addDiary } = useAddDiaryData();
+  const { mutate: updateDiary } = useUpdateDiaryData();
+
+  const [checkedMoods, setCheckedMoods] = useState(() => {
+    const moods = initialData?.post_moods?.map((moodObj) => moodObj.mood) || [];
+    return {
+      anxious: moods.includes("anxious"),
+      depressed: moods.includes("depressed"),
+      happy: moods.includes("happy"),
+      angry: moods.includes("angry"),
+      tired: moods.includes("tired"),
+    };
+  });
+
   const navigate = useNavigate();
 
-  const [checkedMoods, setCheckedMoods] = useState({
-    anxious: false,
-    depressed: false,
-    happy: false,
-    angry: false,
-    tired: false,
-  });
-  const { mutate: addDiary } = useAddDiaryData();
-
+  const formattedDate = initialData.date
+    ? new Date(initialData.date).toLocaleDateString("en-CA")
+    : "";
   const {
     register,
     setValue,
     handleSubmit,
     formState: { errors },
     clearErrors,
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      date: formattedDate,
+      content: initialData.content || "",
+      mood: initialData.moods || [],
+      score: initialData.score ?? "",
+    },
+  });
+
+  // 초기 감정 값 설정
+  useEffect(() => {
+    if (initialData?.post_moods) {
+      const initialMoods = initialData.post_moods.map(
+        (moodObj) => moodObj.mood
+      );
+      setValue("mood", initialMoods); // 폼에 초기 값 설정
+    }
+  }, [initialData, setValue]);
+
+  const toggleMood = (mood) => {
+    setCheckedMoods((prev) => {
+      const updatedMoods = { ...prev, [mood]: !prev[mood] };
+      const selectedMoods = Object.keys(updatedMoods).filter(
+        (key) => updatedMoods[key]
+      );
+      setValue("mood", selectedMoods);
+      clearErrors("mood");
+      return updatedMoods;
+    });
+  };
+
+  console.log("checked mood: ", checkedMoods);
 
   const onSubmit = (data) => {
     const filteredMoods = Object.keys(checkedMoods).filter(
       (key) => checkedMoods[key]
     );
-    addDiary(data, {
-      onSuccess: () => {
-        navigate("/record");
-      },
-      onError: (error) => {
-        console.error("Failed to add diary:", error.message);
-        alert("Failed to add diary. Please try again.");
-      },
-    });
-  };
+    data.mood = filteredMoods;
 
-  const handleBack = () => {
-    navigate(-1);
-  };
+    const date = new Date(data.date);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
 
-  const toggleMood = (mood) => {
-    setCheckedMoods((prev) => {
-      const newCheckedMoods = { ...prev, [mood]: !prev[mood] };
-      const selectedMoods = Object.keys(newCheckedMoods).filter(
-        (key) => newCheckedMoods[key]
+    if (isUpdate) {
+      updateDiary(
+        { data, postId: initialData.id },
+        {
+          onSuccess: () => {
+            alert("게시글 수정 성공!");
+            navigate(`/diary/${year}/${month}`);
+          },
+          onError: (error) => alert(`게시글 수정 실패: ${error.message}`),
+        }
       );
-      setValue("mood", selectedMoods);
-      clearErrors("mood");
-      return newCheckedMoods;
-    });
+    } else {
+      addDiary(data, {
+        onSuccess: () => {
+          alert("게시글 추가 성공!");
+          navigate(`/diary/${year}/${month}`);
+        },
+        onError: (error) => alert(`게시글 추가 실패: ${error.message}`),
+      });
+    }
   };
 
   return (
@@ -74,7 +117,7 @@ const DiaryForm = () => {
           toggleMood={toggleMood}
           checkedMoods={checkedMoods}
         />
-        <ButtonSection handleBack={handleBack} />
+        <ButtonSection />
       </form>
     </Container>
   );
